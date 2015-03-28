@@ -21,9 +21,10 @@ public class Main {
         }
 
         Reader reader = new Reader();
+        Parser parser = new Parser();
 
-        for (String string : reader.readLines(startLine, lastLine, new File(path))) {
-            System.out.println(string);
+        for (HttpRequest httpRequest : parser.parseFileStrings(reader.readLines(startLine, lastLine, new File(path)))) {
+            System.out.println(httpRequest);
         }
     }
 }
