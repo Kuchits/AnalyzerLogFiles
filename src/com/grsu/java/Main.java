@@ -1,30 +1,30 @@
 package com.grsu.java;
 
-import java.io.File;
+import com.grsu.java.Report.ReportMaxResponseSize;
+import com.grsu.java.Report.ReportTopActiveHosts;
+import com.grsu.java.Report.ReportTotalAmountResponses;
+
 import java.io.IOException;
+import java.text.ParseException;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ParseException {
 
-        String path = args[0];
-        int startLine = Integer.parseInt(args[1]);
-        int lastLine = Integer.parseInt(args[2]) + startLine - 1;
+        Parameters parameters = new Parameters(args);
 
-        if (startLine < 1) {
-            System.out.println("Неверные параметры.");
-            System.exit(0);
-        }
-        if (lastLine < startLine) {
-            System.out.println("Неверные параметры.");
-            System.exit(0);
-        }
-
-        Reader reader = new Reader();
-        Parser parser = new Parser();
-
-        for (HttpRequest httpRequest : parser.parseFileStrings(reader.readLines(startLine, lastLine, new File(path)))) {
-            System.out.println(httpRequest);
+        switch (parameters.getReport()) {
+            case 1:
+                for (String string : new ReportTopActiveHosts().generateReport(parameters)) {
+                    System.out.println(string);
+                }
+                break;
+            case 2:
+                System.out.println(new ReportTotalAmountResponses().generateReport(parameters));
+                break;
+            case 3:
+                System.out.print(new ReportMaxResponseSize().generateReport(parameters));
+                break;
         }
     }
 }
