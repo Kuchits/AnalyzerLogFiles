@@ -1,7 +1,9 @@
 package com.grsu.java.Parser;
 
 import com.grsu.java.Request.Request;
+import com.mysql.fabric.jdbc.FabricMySQLDriver;
 
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,9 +12,25 @@ import java.util.Locale;
 
 public class ParserNasa implements Parser {
 
-    public ArrayList<Request> parseFileStrings(ArrayList<String> fileStrings) throws ParseException {
+    private static final String URL = "jdbc:mysql://localhost:3306/alf";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "root";
+    private static final String INSERT_NEW = "INSERT INTO requests VALUES(?,?,?,?,?,?,?,?)";
+
+    public ArrayList<Request> parseFileStrings(ArrayList<String> fileStrings) throws ParseException, SQLException {
+
+        Driver driver = new FabricMySQLDriver();
+        DriverManager.registerDriver(driver);
+
+        Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        Statement statement = connection.createStatement();
+        //Очистка базы данных
+        statement.execute("DELETE FROM requests");
+
+        PreparedStatement preparedStatement = connection.prepareStatement(INSERT_NEW);
 
         ArrayList<Request> requests = new ArrayList<>();
+        int i = 1;
         for (String string : fileStrings) {
 
             String[] buffer = string.split("( - - )|( \")|(\\s)|(\" )");
@@ -48,6 +66,19 @@ public class ParserNasa implements Parser {
                     } else bytes = Integer.parseInt(buffer[7]);
                 }
 
+                //Добавление записи в базу.
+                preparedStatement.setInt(1, i);
+                i++;
+                preparedStatement.setString(2, host);
+                preparedStatement.setString(3, temp);
+                preparedStatement.setString(4, httpMethod);
+                preparedStatement.setString(5, path);
+                preparedStatement.setString(6, httpProtocol);
+                preparedStatement.setInt(7, replyCode);
+                preparedStatement.setInt(8, bytes);
+
+                preparedStatement.execute();
+
                 Request request = new Request(host, timeStamp, httpMethod, path, httpProtocol, replyCode, bytes);
                 requests.add(request);
             }
@@ -59,6 +90,8 @@ public class ParserNasa implements Parser {
 
             //else System.out.println(string);
         }
+        preparedStatement.close();
+        statement.close();
         return requests;
     }
 }

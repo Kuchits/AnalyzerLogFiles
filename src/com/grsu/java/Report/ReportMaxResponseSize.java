@@ -2,21 +2,24 @@ package com.grsu.java.Report;
 
 import com.grsu.java.Parameters;
 import com.grsu.java.Request.Request;
+import com.mysql.fabric.jdbc.FabricMySQLDriver;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 
 public class ReportMaxResponseSize implements ReportGenerator<Request, Parameters> {
 
     @Override
-    public Request generateReport(Parameters p) throws IOException, ParseException {
+    public Request generateReport(Parameters p) throws IOException, ParseException, SQLException {
 
         ArrayList<String> fileStrings = p.getReader().readLines(p.getStartLine(), p.getLastLine(),
                 new File(p.getPath()));
 
         ArrayList<Request> requests = p.getParser().parseFileStrings(fileStrings);
+
         ArrayList<Request> tempRequests = new ArrayList<>();
 
         for (Request request : requests) {

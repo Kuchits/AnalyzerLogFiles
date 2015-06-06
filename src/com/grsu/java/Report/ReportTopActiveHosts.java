@@ -5,13 +5,14 @@ import com.grsu.java.Request.Request;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.*;
 
 public class ReportTopActiveHosts implements ReportGenerator<ArrayList<String>, Parameters> {
 
     @Override
-    public ArrayList<String> generateReport(Parameters p) throws IOException, ParseException {
+    public ArrayList<String> generateReport(Parameters p) throws IOException, ParseException, SQLException {
 
         ArrayList<String> fileStrings = p.getReader().readLines(p.getStartLine(), p.getLastLine(),
                 new File(p.getPath()));

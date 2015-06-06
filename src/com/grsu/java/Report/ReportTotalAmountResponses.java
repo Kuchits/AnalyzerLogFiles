@@ -7,18 +7,19 @@ import com.grsu.java.Request.Request;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
 public class ReportTotalAmountResponses implements ReportGenerator<Integer, Parameters> {
 
     @Override
-    public Integer generateReport(Parameters p) throws IOException, ParseException {
+    public Integer generateReport(Parameters p) throws IOException, ParseException, SQLException {
 
-        ArrayList<String> fileStrings = new ReaderDefault().readLines(p.getStartLine(), p.getLastLine(),
+        ArrayList<String> fileStrings = p.getReader().readLines(p.getStartLine(), p.getLastLine(),
                 new File(p.getPath()));
 
-        ArrayList<Request> requests = new ParserNasa().parseFileStrings(fileStrings);
+        ArrayList<Request> requests = p.getParser().parseFileStrings(fileStrings);
         ArrayList<Request> tempRequests = new ArrayList<>();
 
         for (Request request : requests) {
